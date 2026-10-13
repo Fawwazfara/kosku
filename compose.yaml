@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: kosku-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kosku
+      POSTGRES_USER: kosku
+      POSTGRES_PASSWORD: kosku
+    ports:
+      - "5432:5432"
+    volumes:
+      - kosku-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kosku -d kosku"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  kosku-pg-data:

@@ -1,0 +1,49 @@
+services:
+  app:
+    build:
+      context: .
+    image: kosku-app:latest
+    container_name: kosku-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - kosku-storage:/var/www/storage
+      - kosku-bootstrap:/var/www/bootstrap/cache
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    image: kosku-app:latest
+    container_name: kosku-web
+    restart: unless-stopped
+    command: ["nginx", "-g", "daemon off;"]
+    ports:
+      - "80:80"
+    volumes:
+      - kosku-storage:/var/www/storage
+      - kosku-bootstrap:/var/www/bootstrap/cache
+    depends_on:
+      - app
+
+  db:
+    image: postgres:16-alpine
+    container_name: kosku-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - kosku-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  kosku-storage:
+  kosku-bootstrap:
+  kosku-pg:
