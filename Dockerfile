@@ -14,7 +14,7 @@ COPY vite.config.js ./
 RUN npm run build
 
 # Stage 3: Runtime (PHP-FPM + Nginx di satu image)
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
         nginx \
@@ -40,6 +40,7 @@ WORKDIR /var/www
 COPY . .
 
 COPY --from=vendor /app/vendor ./vendor
+COPY --from=vendor /usr/bin/composer /usr/local/bin/composer
 COPY --from=assets /app/public/build ./public/build
 COPY docker/nginx-default.conf /etc/nginx/http.d/default.conf
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint
