@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: .
-    image: kosku-app:latest
+    image: 1237050038/kosku:latest
     container_name: kosku-app
     restart: unless-stopped
     env_file:
@@ -15,7 +13,7 @@ services:
         condition: service_healthy
 
   web:
-    image: kosku-app:latest
+    image: 1237050038/kosku:latest
     container_name: kosku-web
     restart: unless-stopped
     command: ["nginx", "-g", "daemon off;"]
