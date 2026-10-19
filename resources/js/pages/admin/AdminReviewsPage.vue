@@ -7,6 +7,7 @@ import { formatDate } from '../../utils/format';
 import AdminNav from '../../components/AdminNav.vue';
 import Pagination from '../../components/Pagination.vue';
 import EmptyState from '../../components/EmptyState.vue';
+import AppIcon from '../../components/AppIcon.vue';
 
 useSeo({ title: 'Moderasi Ulasan' });
 
@@ -16,6 +17,12 @@ const meta = ref(null);
 const loading = ref(true);
 const filter = ref('all');
 const busyId = ref(null);
+
+const options = [
+    { value: 'all', label: 'Semua' },
+    { value: 'visible', label: 'Tampil' },
+    { value: 'hidden', label: 'Disembunyikan' },
+];
 
 async function load(page = 1) {
     loading.value = true;
@@ -57,21 +64,17 @@ onMounted(() => load());
 
 <template>
     <div class="mx-auto max-w-6xl px-4 py-8">
-        <h1 class="text-xl font-bold text-slate-900">Moderasi Ulasan</h1>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">Moderasi Ulasan</h1>
         <div class="mt-4">
             <AdminNav />
         </div>
 
-        <div class="mt-4 flex gap-2">
+        <div class="mt-4 flex flex-wrap gap-2">
             <button
-                v-for="option in [
-                    { value: 'all', label: 'Semua' },
-                    { value: 'visible', label: 'Tampil' },
-                    { value: 'hidden', label: 'Disembunyikan' },
-                ]"
+                v-for="option in options"
                 :key="option.value"
-                class="rounded-full border px-3 py-1.5 text-xs font-medium"
-                :class="filter === option.value ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-200 text-slate-600'"
+                class="chip"
+                :class="filter === option.value ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300'"
                 @click="filter = option.value; load()"
             >
                 {{ option.label }}
@@ -83,45 +86,34 @@ onMounted(() => load());
         </div>
 
         <div v-else-if="reviews.length" class="mt-4 space-y-3">
-            <div v-for="review in reviews" :key="review.id" class="rounded-2xl border border-slate-200 bg-white p-4">
+            <div v-for="review in reviews" :key="review.id" class="card p-4">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div class="min-w-0">
-                        <div class="flex items-center gap-2">
-                            <span class="font-semibold text-slate-800">{{ review.user?.name }}</span>
-                            <span class="text-sm text-amber-500">{{ '★'.repeat(review.rating) }}</span>
-                            <span v-if="review.is_hidden" class="rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-semibold text-rose-700">
-                                Disembunyikan
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                                {{ review.user?.name?.charAt(0).toUpperCase() }}
                             </span>
+                            <span class="font-semibold text-slate-800">{{ review.user?.name }}</span>
+                            <span class="flex items-center gap-0.5 text-amber-500">
+                                <AppIcon v-for="n in review.rating" :key="n" name="star" :size="14" />
+                            </span>
+                            <span v-if="review.is_hidden" class="badge bg-rose-100 text-rose-700">Disembunyikan</span>
                         </div>
-                        <p class="text-xs text-slate-500">
-                            pada <strong>{{ review.kos?.name }}</strong> · {{ formatDate(review.created_at) }}
+                        <p class="mt-1 text-xs text-slate-500">
+                            pada <strong class="text-slate-700">{{ review.kos?.name }}</strong> · {{ formatDate(review.created_at) }}
                         </p>
                         <p class="mt-1 text-sm text-slate-600">{{ review.comment || '(tanpa komentar)' }}</p>
                     </div>
 
                     <div class="flex gap-2">
-                        <button
-                            v-if="!review.is_hidden"
-                            class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-                            :disabled="busyId === review.id"
-                            @click="act(review, 'hide')"
-                        >
-                            Sembunyikan
+                        <button v-if="!review.is_hidden" class="btn btn-secondary" :disabled="busyId === review.id" @click="act(review, 'hide')">
+                            <AppIcon name="eye-off" :size="15" /> Sembunyikan
                         </button>
-                        <button
-                            v-else
-                            class="rounded-lg border border-emerald-200 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
-                            :disabled="busyId === review.id"
-                            @click="act(review, 'unhide')"
-                        >
-                            Tampilkan
+                        <button v-else class="btn border border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50" :disabled="busyId === review.id" @click="act(review, 'unhide')">
+                            <AppIcon name="eye" :size="15" /> Tampilkan
                         </button>
-                        <button
-                            class="rounded-lg border border-rose-200 px-3 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-50"
-                            :disabled="busyId === review.id"
-                            @click="act(review, 'delete')"
-                        >
-                            Hapus
+                        <button class="btn border border-rose-200 bg-white text-rose-600 hover:bg-rose-50" :disabled="busyId === review.id" @click="act(review, 'delete')">
+                            <AppIcon name="trash" :size="15" /> Hapus
                         </button>
                     </div>
                 </div>
@@ -130,6 +122,6 @@ onMounted(() => load());
             <Pagination :meta="meta" @change="load" />
         </div>
 
-        <EmptyState v-else icon="⭐" title="Tidak ada ulasan" description="Belum ada ulasan yang cocok dengan filter ini." />
+        <EmptyState v-else icon="star" title="Tidak ada ulasan" description="Belum ada ulasan yang cocok dengan filter ini." />
     </div>
 </template>

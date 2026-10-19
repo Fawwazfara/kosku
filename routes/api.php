@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Owner\DashboardController as OwnerDashboardControll
 use App\Http\Controllers\Api\Owner\KosController as OwnerKosController;
 use App\Http\Controllers\Api\Owner\PhotoController as OwnerPhotoController;
 use App\Http\Controllers\Api\Owner\StockController as OwnerStockController;
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Models\Kos;
 use App\Models\User;
@@ -32,10 +33,13 @@ Route::middleware('throttle:20,1')->group(function () {
 Route::middleware('throttle:10,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/user/role', [AuthController::class, 'chooseRole']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Mahasiswa

@@ -25,6 +25,24 @@ const routes = [
         meta: { guestOnly: true },
     },
     {
+        path: '/lupa-password',
+        name: 'password.request',
+        component: () => import('../pages/ForgotPasswordPage.vue'),
+        meta: { guestOnly: true },
+    },
+    {
+        path: '/reset-password',
+        name: 'password.reset',
+        component: () => import('../pages/ResetPasswordPage.vue'),
+        meta: { guestOnly: true },
+    },
+    {
+        path: '/pilih-peran',
+        name: 'role.select',
+        component: () => import('../pages/RoleSelectPage.vue'),
+        meta: { requiresAuth: true },
+    },
+    {
         path: '/favorit',
         name: 'favorites',
         component: () => import('../pages/FavoritesPage.vue'),
@@ -106,6 +124,14 @@ router.beforeEach(async (to) => {
 
     if (to.meta.requiresAuth && !auth.isLoggedIn) {
         return { name: 'login', query: { redirect: to.fullPath } };
+    }
+
+    if (auth.needsRoleSelection && to.name !== 'role.select') {
+        return { name: 'role.select' };
+    }
+
+    if (!auth.needsRoleSelection && to.name === 'role.select') {
+        return { name: 'home' };
     }
 
     if (to.meta.guestOnly && auth.isLoggedIn) {

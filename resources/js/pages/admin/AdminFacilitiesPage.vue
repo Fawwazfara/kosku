@@ -4,6 +4,8 @@ import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
 import { useSeo } from '../../composables/useSeo';
 import AdminNav from '../../components/AdminNav.vue';
+import AppIcon from '../../components/AppIcon.vue';
+import EmptyState from '../../components/EmptyState.vue';
 
 useSeo({ title: 'Master Fasilitas' });
 
@@ -73,44 +75,54 @@ onMounted(load);
 
 <template>
     <div class="mx-auto max-w-4xl px-4 py-8">
-        <h1 class="text-xl font-bold text-slate-900">Master Fasilitas</h1>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">Master Fasilitas</h1>
         <div class="mt-4">
             <AdminNav />
         </div>
 
-        <form class="mt-6 flex flex-wrap items-end gap-2 rounded-2xl border border-slate-200 bg-white p-4" @submit.prevent="submit">
-            <div class="flex-1">
-                <label class="mb-1 block text-sm font-medium text-slate-700">Nama fasilitas</label>
-                <input v-model="form.name" type="text" required class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-brand-500 focus:ring-brand-500" />
+        <form class="card mt-6 flex flex-wrap items-end gap-3 p-4" @submit.prevent="submit">
+            <div class="min-w-48 flex-1">
+                <label class="label">Nama fasilitas</label>
+                <input v-model="form.name" type="text" required class="input" placeholder="cth. WiFi" />
                 <p v-if="errors.name" class="mt-1 text-xs text-rose-600">{{ errors.name[0] }}</p>
             </div>
             <div class="w-40">
-                <label class="mb-1 block text-sm font-medium text-slate-700">Ikon (opsional)</label>
-                <input v-model="form.icon" type="text" placeholder="wifi" class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-brand-500 focus:ring-brand-500" />
+                <label class="label">Ikon (opsional)</label>
+                <input v-model="form.icon" type="text" placeholder="wifi" class="input" />
             </div>
-            <button type="submit" :disabled="saving" class="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50">
+            <button type="submit" :disabled="saving" class="btn btn-primary">
+                <AppIcon :name="editingId ? 'check' : 'plus'" :size="15" />
                 {{ editingId ? 'Simpan' : 'Tambah' }}
             </button>
-            <button v-if="editingId" type="button" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600" @click="cancelEdit">
-                Batal
-            </button>
+            <button v-if="editingId" type="button" class="btn btn-secondary" @click="cancelEdit">Batal</button>
         </form>
 
         <div v-if="loading" class="mt-4 space-y-2">
             <div v-for="n in 5" :key="n" class="h-12 animate-pulse rounded-xl bg-slate-200"></div>
         </div>
 
-        <div v-else class="mt-4 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div v-else-if="facilities.length" class="card mt-4 divide-y divide-slate-100 overflow-hidden p-0">
             <div v-for="facility in facilities" :key="facility.id" class="flex items-center justify-between gap-3 px-4 py-3">
-                <div>
-                    <p class="text-sm font-medium text-slate-800">{{ facility.name }}</p>
-                    <p class="text-xs text-slate-400">{{ facility.icon || 'tanpa ikon' }} · dipakai {{ facility.kos_count || 0 }} kos</p>
+                <div class="flex min-w-0 items-center gap-3">
+                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
+                        <AppIcon name="sparkles" :size="16" />
+                    </span>
+                    <div class="min-w-0">
+                        <p class="truncate text-sm font-medium text-slate-800">{{ facility.name }}</p>
+                        <p class="text-xs text-slate-400">{{ facility.icon || 'tanpa ikon' }} · dipakai {{ facility.kos_count || 0 }} kos</p>
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <button class="text-sm font-medium text-brand-700 hover:underline" @click="startEdit(facility)">Edit</button>
-                    <button class="text-sm font-medium text-rose-600 hover:underline" @click="remove(facility)">Hapus</button>
+                <div class="flex shrink-0 gap-1">
+                    <button class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-brand-700" title="Edit" @click="startEdit(facility)">
+                        <AppIcon name="pencil" :size="16" />
+                    </button>
+                    <button class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-rose-600" title="Hapus" @click="remove(facility)">
+                        <AppIcon name="trash" :size="16" />
+                    </button>
                 </div>
             </div>
         </div>
+
+        <EmptyState v-else icon="sparkles" title="Belum ada fasilitas" description="Tambahkan fasilitas master pertama untuk dipakai kos." />
     </div>
 </template>

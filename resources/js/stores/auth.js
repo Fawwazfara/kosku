@@ -15,6 +15,14 @@ export const useAuthStore = defineStore('auth', {
         isStudent: (state) => state.user?.role === 'student',
         isVerifiedOwner: (state) => state.user?.role === 'owner' && state.user?.is_verified,
         ownerPending: (state) => state.user?.role === 'owner' && !state.user?.is_verified,
+        needsRoleSelection: (state) => !!state.user && !state.user.role,
+        initials: (state) =>
+            (state.user?.name || '?')
+                .trim()
+                .split(/\s+/)
+                .slice(0, 2)
+                .map((part) => part.charAt(0).toUpperCase())
+                .join(''),
     },
 
     actions: {
@@ -39,6 +47,25 @@ export const useAuthStore = defineStore('auth', {
         async register(payload) {
             await ensureCsrf();
             const { data } = await api.post('/register', payload);
+            this.user = data.user;
+            return data;
+        },
+
+        async forgotPassword(email) {
+            await ensureCsrf();
+            const { data } = await api.post('/forgot-password', { email });
+            return data;
+        },
+
+        async resetPassword(payload) {
+            await ensureCsrf();
+            const { data } = await api.post('/reset-password', payload);
+            return data;
+        },
+
+        async chooseRole(role) {
+            await ensureCsrf();
+            const { data } = await api.post('/user/role', { role });
             this.user = data.user;
             return data;
         },

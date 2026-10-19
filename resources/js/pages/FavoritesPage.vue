@@ -28,8 +28,8 @@ onMounted(() => load());
 
 <template>
     <div class="mx-auto max-w-6xl px-4 py-8">
-        <h1 class="text-xl font-bold text-slate-900">Kos Favorit Saya</h1>
-        <p class="mt-1 text-sm text-slate-500">Kos yang kamu simpan untuk dibandingkan nanti.</p>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">Kos Favorit Saya</h1>
+        <p class="mt-1 text-sm text-slate-500">{{ meta ? meta.total : 0 }} kos yang kamu simpan untuk dibandingkan nanti.</p>
 
         <div v-if="loading" class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
             <div v-for="n in 3" :key="n" class="aspect-[4/3] animate-pulse rounded-2xl bg-slate-200"></div>
@@ -46,13 +46,11 @@ onMounted(() => load());
 
         <EmptyState
             v-else
-            icon="♡"
+            icon="heart"
             title="Belum ada kos favorit"
             description="Tekan tombol simpan di halaman detail kos untuk menyimpannya di sini."
         >
-            <RouterLink :to="{ name: 'home' }" class="mt-4 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
-                Cari kos
-            </RouterLink>
+            <RouterLink :to="{ name: 'home' }" class="btn btn-primary mt-4">Cari kos</RouterLink>
         </EmptyState>
     </div>
 </template>

@@ -7,18 +7,90 @@
 @source '../**/*.vue';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-    --color-brand-50: #eef7f4;
-    --color-brand-100: #d5ebe4;
-    --color-brand-200: #abd8c9;
-    --color-brand-300: #78bda8;
-    --color-brand-400: #4c9f87;
-    --color-brand-500: #2f836c;
-    --color-brand-600: #226956;
-    --color-brand-700: #1c5445;
-    --color-brand-800: #184338;
-    --color-brand-900: #14372f;
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-50: #f0fdfa;
+    --color-brand-100: #ccfbf1;
+    --color-brand-200: #99f6e4;
+    --color-brand-300: #5eead4;
+    --color-brand-400: #2dd4bf;
+    --color-brand-500: #14b8a6;
+    --color-brand-600: #0d9488;
+    --color-brand-700: #0f766e;
+    --color-brand-800: #115e59;
+    --color-brand-900: #134e4a;
+    --color-brand-950: #042f2e;
+
+    --shadow-soft: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.12);
+    --shadow-card: 0 1px 3px 0 rgb(15 23 42 / 0.06), 0 16px 40px -20px rgb(15 23 42 / 0.18);
+
+    --radius-4xl: 2rem;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        @apply bg-slate-50 text-slate-800 antialiased;
+    }
+
+    ::selection {
+        @apply bg-brand-200 text-brand-950;
+    }
+}
+
+@layer components {
+    .btn {
+        @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+    }
+
+    .btn-primary {
+        @apply bg-brand-600 text-white shadow-soft hover:bg-brand-700 active:scale-[0.98];
+    }
+
+    .btn-secondary {
+        @apply border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98];
+    }
+
+    .btn-ghost {
+        @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900;
+    }
+
+    .btn-danger {
+        @apply bg-rose-600 text-white shadow-soft hover:bg-rose-700 active:scale-[0.98];
+    }
+
+    .input {
+        @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30;
+    }
+
+    .label {
+        @apply mb-1.5 block text-sm font-medium text-slate-700;
+    }
+
+    .card {
+        @apply rounded-2xl border border-slate-200/80 bg-white shadow-soft;
+    }
+
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+    }
+
+    .chip {
+        @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition;
+    }
+
+    .link {
+        @apply font-semibold text-brand-700 underline-offset-2 hover:underline;
+    }
+
+    .section-title {
+        @apply text-base font-semibold tracking-tight text-slate-900;
+    }
 }
 
 .leaflet-container {

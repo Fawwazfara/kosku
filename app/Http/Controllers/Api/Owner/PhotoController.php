@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Owner;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PhotoUpdateRequest;
 use App\Http\Requests\PhotoUploadRequest;
-use App\Http\Resources\KosDetailResource;
 use App\Http\Resources\PhotoResource;
 use App\Models\Kos;
 use App\Models\KosPhoto;
@@ -21,9 +20,18 @@ class PhotoController extends Controller
 
         $order = (int) KosPhoto::query()->where('kos_id', $kos->id)->max('sort_order');
         $count = $kos->photos()->count();
+        $sisa = max(0, Kos::MAX_PHOTOS - $count);
+        $files = array_slice($request->file('photos'), 0, $sisa);
+
+        if (empty($files)) {
+            return response()->json([
+                'message' => 'Batas maksimal '.Kos::MAX_PHOTOS.' foto sudah tercapai.',
+            ], 422);
+        }
+
         $created = [];
 
-        foreach ($request->file('photos') as $file) {
+        foreach ($files as $file) {
             $path = $file->store("kos/{$kos->id}", 'public');
 
             $created[] = $kos->photos()->create([
@@ -39,7 +47,7 @@ class PhotoController extends Controller
 
         return response()->json([
             'message' => count($created).' foto diunggah.',
-            'photos' => PhotoResource::collection($kos->fresh('photos')),
+            'photos' => PhotoResource::collection($kos->photos()->get()),
         ], 201);
     }
 
@@ -80,7 +88,7 @@ class PhotoController extends Controller
 
         return response()->json([
             'message' => 'Foto dihapus.',
-            'photos' => PhotoResource::collection($kos->fresh('photos')),
+            'photos' => PhotoResource::collection($kos->photos()->get()),
         ]);
     }
 
@@ -99,7 +107,7 @@ class PhotoController extends Controller
 
         return response()->json([
             'message' => 'Urutan foto disimpan.',
-            'photos' => PhotoResource::collection($kos->fresh('photos')),
+            'photos' => PhotoResource::collection($kos->photos()->get()),
         ]);
     }
 }

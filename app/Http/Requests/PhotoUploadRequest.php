@@ -4,13 +4,12 @@ namespace App\Http\Requests;
 
 use App\Models\Kos;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\UploadedFile;
 
 class PhotoUploadRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        /** @var \App\Models\Kos $kos */
+        /** @var Kos $kos */
         $kos = $this->route('kos');
 
         return $this->user()?->can('managePhotos', $kos) === true;
@@ -21,19 +20,19 @@ class PhotoUploadRequest extends FormRequest
      */
     public function rules(): array
     {
-        /** @var \App\Models\Kos $kos */
+        /** @var Kos $kos */
         $kos = $this->route('kos');
-        $sisa = Kos::MAX_PHOTOS - $kos->photos()->count();
+        $sisa = max(0, Kos::MAX_PHOTOS - $kos->photos()->count());
 
         return [
-            'photos' => ['required', 'array', 'max:'.max($sisa, 1)],
+            'photos' => ['required', 'array', 'min:1', 'max:'.$sisa],
             'photos.*' => ['required', 'image', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
         ];
     }
 
     public function messages(): array
     {
-        /** @var \App\Models\Kos $kos */
+        /** @var Kos $kos */
         $kos = $this->route('kos');
 
         return [

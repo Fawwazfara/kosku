@@ -32,7 +32,7 @@ class Kos extends Model
 
     public const STATUSES = ['pending', 'active', 'hidden', 'rejected'];
 
-    public const MAX_PHOTOS = 8;
+    public const MAX_PHOTOS = 10;
 
     protected $fillable = [
         'owner_id',
